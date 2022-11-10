@@ -1,4 +1,5 @@
 import type { CurrentQuestion } from 'src/types';
+import { onMount } from 'svelte';
 import { writable } from 'svelte/store';
 import { sponsorSlideQuestion } from './sponsorSlide';
 
@@ -17,9 +18,12 @@ async function getFromServer(fetchAPI: typeof fetch, set: (question: CurrentQues
 export function createStore(fetchAPI: typeof fetch) {
 	console.log('Creating store');
 	const currentQuestion = writable<CurrentQuestion>(sponsorSlideQuestion);
-  getFromServer(fetchAPI, currentQuestion.set);
+  onMount(() => {
+    getFromServer(fetchAPI, currentQuestion.set);
+  })
 	const currentQuestionSubscribe = currentQuestion.subscribe;
 	return {
 		currentQuestionSubscribe
+    
 	};
 }
