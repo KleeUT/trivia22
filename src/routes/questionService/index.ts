@@ -1,1 +1,1 @@
-export { currentQuestionSubscribe } from './questionStore';
+export { createStore } from './questionStore';

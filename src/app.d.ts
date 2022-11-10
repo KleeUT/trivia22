@@ -4,9 +4,9 @@
 /// <reference types="@sveltejs/adapter-cloudflare" />
 
 declare namespace App {
-  interface Platform{
-    env?:{
-      QUESTION_STORE: KVNamespace
-    }
-  }
+	interface Platform {
+		env?: {
+			QUESTION_STORE: KVNamespace;
+		};
+	}
 }
