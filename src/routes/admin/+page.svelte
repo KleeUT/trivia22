@@ -2,10 +2,11 @@
 	import { onMount } from 'svelte';
 	import { authService } from '../../lib/auth/authService';
 	import type { PlanedQuestion, Question } from 'src/types';
+	import { get } from 'svelte/store';
 	let userValue: Object | undefined;
 	let token = 'No token yet';
 	const auth = authService();
-	let questions: PlanedQuestion[] = [];
+
 	auth.user.subscribe((u) => {
 		userValue = u;
 	});
@@ -22,25 +23,22 @@
 	async function logout() {
 		await auth.logout();
 	}
+	let game = new Map<number, PlanedQuestion[]>();
+	let rounds: number[] = [];
 	async function getQuestions() {
 		let r = await fetch('/api/question');
 		let j = (await r.json()) as { data: { questions: PlanedQuestion[] } };
 		const questionData = j.data.questions;
-		questionData.sort((a, b) => {
-			if (a.roundNumber === b.roundNumber) {
-				if (a.questionNumber <= b.questionNumber) {
-					return -1;
-				} else {
-					return 1;
-				}
-			}
-			if (a.roundNumber < b.roundNumber) {
-				return -1;
-			}
-			return 1;
-		});
-		questions = questionData;
+		game = questionData.reduce((p, c) => {
+			const round = p.get(c.roundNumber) || [];
+			round.push(c);
+			p.set(c.roundNumber, round);
+			return p;
+		}, new Map<number, PlanedQuestion[]>());
+
+		rounds = Array.from(game.keys());
 	}
+
 	getQuestions();
 
 	let questionTitle = '';
@@ -69,7 +67,15 @@
 				}
 			})
 		});
+
 		await getQuestions();
+	}
+	let round = 0;
+	function questionForRound(round: number): PlanedQuestion[] {
+		return game.get(round) || [];
+	}
+	function setRound(r: number): void {
+		round = r;
 	}
 </script>
 
@@ -100,9 +106,11 @@
 		<button type="submit">Add</button>
 	</form>
 	<hr />
-	{#each questions as question}
+	{#each rounds as round}
+		<button on:click={() => setRound(round)}>{round}</button>
+	{/each}
+	{#each questionForRound(round) as question}
 		<div>
-			<h2>Round {question.roundNumber} Question {question.questionNumber}</h2>
 			<h3>{question.question.questionTitle}</h3>
 			<pre>{question.question.questionText}</pre>
 		</div>
