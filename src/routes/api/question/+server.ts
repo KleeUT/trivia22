@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import type { Question } from 'src/types';
+import type { PlanedQuestion, Question } from 'src/types';
 import { createQuestionKey } from './utils';
 
 export const GET = async ({ platform }: RequestEvent): Promise<Response> => {
@@ -37,16 +37,16 @@ export async function PUT(e: RequestEvent): Promise<Response> {
 				};
 			};
 			const { questionText, questionTitle, roundNumber, questionNumber } = body.data;
-			const newCurrentQuestion: CurrentQuestion = {
+			const newPlanedQuestion: PlanedQuestion = {
 				question: { questionText, questionTitle },
 				roundNumber,
 				questionNumber
 			};
 			await platform.env?.QUESTION_STORE.put(
 				createQuestionKey({ questionNumber, roundNumber }),
-				JSON.stringify(newCurrentQuestion)
+				JSON.stringify(newPlanedQuestion)
 			);
-			return new Response(JSON.stringify({ data: { newCurrentQuestion } }), { status: 200 });
+			return new Response(JSON.stringify({ data: { newPlanedQuestion } }), { status: 200 });
 		}
 	);
 }

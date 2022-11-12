@@ -1,4 +1,4 @@
-export interface CurrentQuestion {
+export interface PlanedQuestion {
 	question: Question;
 	roundNumber: number;
 	questionNumber: number;

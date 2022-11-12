@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import type { CurrentQuestion, Question } from 'src/types';
+import type { PlanedQuestion, Question } from 'src/types';
 
 const currentQuestionKey = 'currentQuestion';
 export async function GET({ platform }: RequestEvent): Promise<Response> {
@@ -12,7 +12,7 @@ export async function GET({ platform }: RequestEvent): Promise<Response> {
 			});
 		}
 		rawData = v;
-		const question = JSON.parse(v) as CurrentQuestion;
+		const question = JSON.parse(v) as PlanedQuestion;
 		return new Response(JSON.stringify({ data: { currentQuestion: question } }), { status: 200 });
 	} catch (e) {
 		const err = e as Error;
@@ -41,11 +41,11 @@ export async function POST({ request, platform }: RequestEvent): Promise<Respons
 		);
 	}
 	const question = JSON.parse(q) as Question;
-	const newCurrentQuestion: CurrentQuestion = {
+	const newPlanedQuestion: PlanedQuestion = {
 		question,
 		roundNumber: body.data.roundNumber,
 		questionNumber: body.data.questionNumber
 	};
-	platform.env?.QUESTION_STORE.put(currentQuestionKey, JSON.stringify(newCurrentQuestion));
-	return new Response(JSON.stringify({ data: { newCurrentQuestion } }), { status: 200 });
+	platform.env?.QUESTION_STORE.put(currentQuestionKey, JSON.stringify(newPlanedQuestion));
+	return new Response(JSON.stringify({ data: { newPlanedQuestion } }), { status: 200 });
 }
