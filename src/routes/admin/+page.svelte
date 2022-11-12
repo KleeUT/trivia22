@@ -50,6 +50,14 @@
 
 	async function submitQuestion(e: SubmitEvent) {
 		e.preventDefault();
+		console.log('Submitting', {
+			data: {
+				roundNumber,
+				questionNumber,
+				questionTitle,
+				questionText
+			}
+		});
 		await fetch('/api/quetion', {
 			method: 'put',
 			body: JSON.stringify({
@@ -83,12 +91,14 @@
 		</label>
 		<label>
 			Title:
-			<input type="number" bind:value={questionTitle} />
+			<input type="text" bind:value={questionTitle} />
 		</label>
 		<label>
 			Text
-			<input type="number" bind:value={questionText} />
+			<textarea bind:value={questionText} />
+			<input type="text" bind:value={questionText} />
 		</label>
+		<button type="submit">Add</button>
 	</form>
 	<hr />
 	{#each questions as question}
@@ -99,3 +109,9 @@
 		</div>
 	{/each}
 </main>
+
+<style>
+	label {
+		display: block;
+	}
+</style>
