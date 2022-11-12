@@ -58,7 +58,7 @@
 				questionText
 			}
 		});
-		await fetch('/api/quetion', {
+		await fetch('/api/question', {
 			method: 'put',
 			body: JSON.stringify({
 				data: {
@@ -91,12 +91,11 @@
 		</label>
 		<label>
 			Title:
-			<input type="text" bind:value={questionTitle} />
+			<input class="full-width" type="text" bind:value={questionTitle} />
 		</label>
 		<label>
 			Text
-			<textarea bind:value={questionText} />
-			<input type="text" bind:value={questionText} />
+			<textarea class="full-width" bind:value={questionText} />
 		</label>
 		<button type="submit">Add</button>
 	</form>
@@ -113,5 +112,11 @@
 <style>
 	label {
 		display: block;
+	}
+	.full-width {
+		width: 100%;
+	}
+	textarea {
+		height: 10rem;
 	}
 </style>
