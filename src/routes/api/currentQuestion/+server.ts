@@ -1,10 +1,11 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import type { CurrentQuestion } from 'src/types';
+import type { CurrentQuestion, Question } from 'src/types';
 
+const currentQuestionKey = 'currentQuestion';
 export async function GET({ platform }: RequestEvent): Promise<Response> {
 	let rawData = 'not set';
 	try {
-		const v = await platform.env?.QUESTION_STORE.get('currentQuestion', 'text');
+		const v = await platform.env?.QUESTION_STORE.get(currentQuestionKey, 'text');
 		if (!v) {
 			return new Response(JSON.stringify({ err: { message: 'No current question' } }), {
 				status: 404
@@ -20,4 +21,31 @@ export async function GET({ platform }: RequestEvent): Promise<Response> {
 			{ status: 500 }
 		);
 	}
+}
+
+export async function POST({ request, platform }: RequestEvent): Promise<Response> {
+	const body = (await request.json()) as {
+		data: {
+			roundNumber: number;
+			questionNumber: number;
+		};
+	};
+	const q = await platform.env?.QUESTION_STORE.get(`question|round:1|question:1`, 'text');
+	if (!q) {
+		return new Response(
+			JSON.stringify({
+				err: {
+					message: `no question round:${body.data.roundNumber} question:${body.data.questionNumber}`
+				}
+			})
+		);
+	}
+	const question = JSON.parse(q) as Question;
+	const newCurrentQuestion: CurrentQuestion = {
+		question,
+		roundNumber: body.data.roundNumber,
+		questionNumber: body.data.questionNumber
+	};
+	platform.env?.QUESTION_STORE.put(currentQuestionKey, JSON.stringify(newCurrentQuestion));
+	return new Response(JSON.stringify({ data: { newCurrentQuestion } }), { status: 200 });
 }

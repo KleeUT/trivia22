@@ -1,1 +1,1 @@
-export { createStore } from './questionStore';
+export { createService } from './pollingQuestionService';

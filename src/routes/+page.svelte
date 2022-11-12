@@ -1,11 +1,11 @@
 <script>
 	import SvelteMarkdown from 'svelte-markdown';
-	import { createStore } from './questionService';
+	import { createService } from './questionService';
 	let questionText = '';
 	let questionTitle = '';
 	let roundNumber = 0;
 	let questionNumber = 0;
-	const store = createStore(fetch);
+	const store = createService(fetch);
 	store.currentQuestionSubscribe((q) => {
 		questionText = q.question.questionText;
 		questionTitle = q.question.questionTitle;
