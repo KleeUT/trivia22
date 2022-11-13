@@ -1,13 +1,13 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import type { PlanedQuestion, Question } from 'src/types';
-import { createQuestionKey } from './utils';
+import { createQuestionKey, questionPrefix } from './utils';
 
 export const GET = async ({ platform }: RequestEvent): Promise<Response> => {
 	const store = platform.env?.QUESTION_STORE;
 	if (!store) {
 		return new Response(JSON.stringify({ err: { messge: 'No store' } }), { status: 500 });
 	}
-	const keys = await store.list();
+	const keys = await store.list({ prefix: questionPrefix });
 	let questions: Question[] = await Promise.all(
 		keys.keys.map(async (key) => {
 			const questionString = await store.get(key.name);

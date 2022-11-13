@@ -1,5 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import type { PlanedQuestion, Question } from 'src/types';
+import { createQuestionKey } from '../question/utils';
 
 const currentQuestionKey = 'currentQuestion';
 export async function GET({ platform }: RequestEvent): Promise<Response> {
@@ -13,6 +14,7 @@ export async function GET({ platform }: RequestEvent): Promise<Response> {
 		}
 		rawData = v;
 		const question = JSON.parse(v) as PlanedQuestion;
+		console.log(question);
 		return new Response(JSON.stringify({ data: { currentQuestion: question } }), { status: 200 });
 	} catch (e) {
 		const err = e as Error;
@@ -23,14 +25,20 @@ export async function GET({ platform }: RequestEvent): Promise<Response> {
 	}
 }
 
-export async function POST({ request, platform }: RequestEvent): Promise<Response> {
+export async function PUT({ request, platform }: RequestEvent): Promise<Response> {
 	const body = (await request.json()) as {
 		data: {
 			roundNumber: number;
 			questionNumber: number;
 		};
 	};
-	const q = await platform.env?.QUESTION_STORE.get(`question|round:1|question:1`, 'text');
+	const q = await platform.env?.QUESTION_STORE.get(
+		createQuestionKey({
+			roundNumber: body.data.roundNumber,
+			questionNumber: body.data.questionNumber
+		}),
+		'text'
+	);
 	if (!q) {
 		return new Response(
 			JSON.stringify({
@@ -41,11 +49,11 @@ export async function POST({ request, platform }: RequestEvent): Promise<Respons
 		);
 	}
 	const question = JSON.parse(q) as Question;
-	const newPlanedQuestion: PlanedQuestion = {
-		question,
-		roundNumber: body.data.roundNumber,
-		questionNumber: body.data.questionNumber
-	};
-	platform.env?.QUESTION_STORE.put(currentQuestionKey, JSON.stringify(newPlanedQuestion));
-	return new Response(JSON.stringify({ data: { newPlanedQuestion } }), { status: 200 });
+	// const newPlanedQuestion: PlanedQuestion = {
+	// 	question,
+	// 	roundNumber: body.data.roundNumber,
+	// 	questionNumber: body.data.questionNumber
+	// };
+	platform.env?.QUESTION_STORE.put(currentQuestionKey, JSON.stringify(question));
+	return new Response(JSON.stringify({ data: { question } }), { status: 200 });
 }

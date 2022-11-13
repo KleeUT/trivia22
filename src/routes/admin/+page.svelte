@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { authService } from '../../lib/auth/authService';
-	import type { PlanedQuestion, Question } from 'src/types';
-	import { get } from 'svelte/store';
+	import type { PlanedQuestion } from 'src/types';
+	import QuestionList from './QuestionList.svelte';
 	let userValue: Object | undefined;
 	let token = 'No token yet';
 	const auth = authService();
@@ -25,6 +25,7 @@
 	}
 	let game = new Map<number, PlanedQuestion[]>();
 	let rounds: number[] = [];
+	let round = 0;
 	async function getQuestions() {
 		let r = await fetch('/api/question');
 		let j = (await r.json()) as { data: { questions: PlanedQuestion[] } };
@@ -37,6 +38,7 @@
 		}, new Map<number, PlanedQuestion[]>());
 
 		rounds = Array.from(game.keys());
+		setRound(round);
 	}
 
 	getQuestions();
@@ -70,12 +72,15 @@
 
 		await getQuestions();
 	}
-	let round = 0;
-	function questionForRound(round: number): PlanedQuestion[] {
-		return game.get(round) || [];
-	}
+	// function questionForRound(round: number): PlanedQuestion[] {
+	// 	return game.get(round) || [];
+	// }
+	let questions: PlanedQuestion[] = [];
 	function setRound(r: number): void {
 		round = r;
+		questions = game.get(r) || [];
+
+		console.log('setting round', { r, questions });
 	}
 </script>
 
@@ -109,12 +114,7 @@
 	{#each rounds as round}
 		<button on:click={() => setRound(round)}>{round}</button>
 	{/each}
-	{#each questionForRound(round) as question}
-		<div>
-			<h3>{question.question.questionTitle}</h3>
-			<pre>{question.question.questionText}</pre>
-		</div>
-	{/each}
+	<QuestionList {questions} />
 </main>
 
 <style>
@@ -126,5 +126,12 @@
 	}
 	textarea {
 		height: 10rem;
+	}
+	button {
+		padding: 0.5rem;
+		background: white;
+		border: 1px solid blue;
+		color: blue;
+		cursor: pointer;
 	}
 </style>

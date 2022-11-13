@@ -7,7 +7,7 @@ export const sponsorSlideQuestion: PlanedQuestion = {
 		questionText: `
 * Newy Tech People
 * Galah Cyber
-* ...Others
+* ArrowTail
     `,
 		questionTitle: 'Please thank our sponsors'
 	}
