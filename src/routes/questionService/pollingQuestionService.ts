@@ -13,9 +13,7 @@ async function getFromServer(
 		console.error({ status: fetchResponse.status, res });
 		return;
 	}
-	console.log('fetched data', fetchResponse.status, fetchResponse.ok);
 	const body = (await fetchResponse.json()) as { data: { currentQuestion: PlanedQuestion } };
-	console.log('decoded body', body);
 	set(body.data.currentQuestion);
 }
 
@@ -23,7 +21,7 @@ function poll(action: () => void) {
 	setTimeout(() => {
 		action();
 		poll(action);
-	}, 5000);
+	}, 2500);
 }
 
 async function setNextQuestion(
@@ -40,9 +38,21 @@ async function setNextQuestion(
 		})
 	});
 }
+async function getAllQuestions(): Promise<Map<number, PlanedQuestion[]>> {
+	let r = await fetch('/api/question');
+	let j = (await r.json()) as { data: { questions: PlanedQuestion[] } };
+	const questionData = j.data.questions;
+	const game = questionData.reduce((p, c) => {
+		const round = p.get(c.roundNumber) || [];
+		round.push(c);
+		p.set(c.roundNumber, round);
+		return p;
+	}, new Map<number, PlanedQuestion[]>());
+
+	return game;
+}
 
 export function createService(fetchAPI: typeof fetch) {
-	console.log('Creating store');
 	const currentQuestion = writable<PlanedQuestion>(sponsorSlideQuestion);
 	onMount(() => {
 		poll(() => getFromServer(fetchAPI, currentQuestion.set));
@@ -51,6 +61,7 @@ export function createService(fetchAPI: typeof fetch) {
 	return {
 		currentQuestionSubscribe,
 		getCurrent: () => getFromServer(fetchAPI, currentQuestion.set),
+		getAllQuestions,
 		setNext: (details: { roundNumber: number; questionNumber: number }) =>
 			setNextQuestion(fetchAPI, details)
 	};

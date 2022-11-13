@@ -14,7 +14,6 @@ export async function GET({ platform }: RequestEvent): Promise<Response> {
 		}
 		rawData = v;
 		const question = JSON.parse(v) as PlanedQuestion;
-		console.log(question);
 		return new Response(JSON.stringify({ data: { currentQuestion: question } }), { status: 200 });
 	} catch (e) {
 		const err = e as Error;

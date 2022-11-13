@@ -8,12 +8,10 @@
 	let questionNumber = 0;
 	const questionService = createService(fetch);
 	questionService.currentQuestionSubscribe((q) => {
-		console.log('updating current', { q }, { question: q.question });
 		questionText = q.question.questionText;
 		questionTitle = q.question.questionTitle;
 		roundNumber = q.roundNumber;
 		questionNumber = q.questionNumber;
-		console.log({ questionText, questionNumber, questionTitle, roundNumber, question: q.question });
 	});
 </script>
 

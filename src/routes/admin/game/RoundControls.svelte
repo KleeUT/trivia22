@@ -1,9 +1,16 @@
 <script lang="ts">
 	import type { createService } from 'src/routes/questionService';
+	import type { PlanedQuestion } from 'src/types';
+	import { onMount } from 'svelte';
 
 	export let round = 0;
 	export let question = 0;
 	export let questionService: ReturnType<typeof createService>;
+	let allQuestions: Map<number, PlanedQuestion[]> = new Map();
+	onMount(async () => {
+		allQuestions = await questionService.getAllQuestions();
+	});
+	$: questionsInRound = allQuestions.get(round)?.length;
 	function next() {
 		questionService.setNext({ roundNumber: round, questionNumber: question + 1 });
 	}
@@ -12,9 +19,6 @@
 			return;
 		}
 		questionService.setNext({ roundNumber: round, questionNumber: question - 1 });
-	}
-	function refresh() {
-		questionService.getCurrent();
 	}
 	let changeRound: number = 0;
 	function setRound(e: SubmitEvent) {
@@ -37,6 +41,9 @@
 <div class="control-block">
 	<button on:click={previous}>Prev</button>
 	<button class="large" on:click={next}>Next</button>
+</div>
+<div>
+	<p>Round: {round} - {question} / {questionsInRound}</p>
 </div>
 
 <style>

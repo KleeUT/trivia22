@@ -3,10 +3,11 @@
 	import { authService } from '../../lib/auth/authService';
 	import type { PlanedQuestion } from 'src/types';
 	import QuestionList from './QuestionList.svelte';
+	import { createService } from '../questionService';
 	let userValue: Object | undefined;
 	let token = 'No token yet';
 	const auth = authService();
-
+	const service = createService(fetch);
 	auth.user.subscribe((u) => {
 		userValue = u;
 	});
@@ -17,7 +18,6 @@
 		await auth.handleRedirect();
 	});
 	async function login() {
-		console.log('login');
 		await auth.loginWithRedirect();
 	}
 	async function logout() {
@@ -27,16 +27,7 @@
 	let rounds: number[] = [];
 	let round = 0;
 	async function getQuestions() {
-		let r = await fetch('/api/question');
-		let j = (await r.json()) as { data: { questions: PlanedQuestion[] } };
-		const questionData = j.data.questions;
-		game = questionData.reduce((p, c) => {
-			const round = p.get(c.roundNumber) || [];
-			round.push(c);
-			p.set(c.roundNumber, round);
-			return p;
-		}, new Map<number, PlanedQuestion[]>());
-
+		game = await service.getAllQuestions();
 		rounds = Array.from(game.keys());
 		setRound(round);
 	}
@@ -50,14 +41,6 @@
 
 	async function submitQuestion(e: SubmitEvent) {
 		e.preventDefault();
-		console.log('Submitting', {
-			data: {
-				roundNumber,
-				questionNumber,
-				questionTitle,
-				questionText
-			}
-		});
 		await fetch('/api/question', {
 			method: 'put',
 			body: JSON.stringify({
@@ -72,15 +55,10 @@
 
 		await getQuestions();
 	}
-	// function questionForRound(round: number): PlanedQuestion[] {
-	// 	return game.get(round) || [];
-	// }
 	let questions: PlanedQuestion[] = [];
 	function setRound(r: number): void {
 		round = r;
 		questions = game.get(r) || [];
-
-		console.log('setting round', { r, questions });
 	}
 </script>
 
