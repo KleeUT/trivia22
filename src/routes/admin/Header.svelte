@@ -5,30 +5,26 @@
 </script>
 
 <header>
-	<div class="corner">
-		<a href="https://kit.svelte.dev">
-			<!-- <img src={logo} alt="SvelteKit" /> -->
-		</a>
-	</div>
+	<div class="corner" />
 
 	<nav>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
 			<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
 		</svg>
 		<ul>
-			<li>Sponsor 1</li>
-			<li>Sponsor 2</li>
+			<li aria-current={$page.url.pathname === '/admin' ? 'page' : undefined}>
+				<a href="/admin">Admin</a>
+			</li>
+			<li aria-current={$page.url.pathname === '/game' ? 'page' : undefined}>
+				<a href="/admin/game">Game</a>
+			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
 			<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
 		</svg>
 	</nav>
 
-	<div class="corner">
-		<a href="https://github.com/sveltejs/kit">
-			<!-- <img src={github} alt="GitHub" /> -->
-		</a>
-	</div>
+	<div class="corner" />
 </header>
 
 <style>
@@ -88,5 +84,35 @@
 	li {
 		position: relative;
 		height: 100%;
+	}
+
+	li[aria-current='page']::before {
+		--size: 6px;
+		content: '';
+		width: 0;
+		height: 0;
+		position: absolute;
+		top: 0;
+		left: calc(50% - var(--size));
+		border: var(--size) solid transparent;
+		border-top: var(--size) solid var(--color-theme-1);
+	}
+
+	nav a {
+		display: flex;
+		height: 100%;
+		align-items: center;
+		padding: 0 0.5rem;
+		color: var(--color-text);
+		font-weight: 700;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		text-decoration: none;
+		transition: color 0.2s linear;
+	}
+
+	a:hover {
+		color: var(--color-theme-1);
 	}
 </style>

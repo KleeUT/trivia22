@@ -1,1 +1,1 @@
-export { currentQuestionSubscribe } from './questionStore';
+export { createService } from './pollingQuestionService';
