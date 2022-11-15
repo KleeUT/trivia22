@@ -18,8 +18,24 @@ export function authService() {
 		});
 	}
 
+	async function refreshToken(): Promise<boolean> {
+		try {
+			if (!client) {
+				client = await createClient();
+			}
+			const authToken = await client.getTokenSilently();
+			token.set(authToken);
+			return true;
+		} catch (e) {
+			console.error(e);
+			return false;
+		}
+	}
+
 	async function handleRedirect() {
+		console.log('redirect');
 		if (!window) {
+			console.log('no window');
 			return;
 		}
 		if (!client) {
@@ -37,6 +53,9 @@ export function authService() {
 			console.log({ userFromAuth0, token, query: window.location.search });
 			window.history.replaceState({}, '', window.location.origin + window.location.pathname);
 			// window.location.search = '';
+		} else {
+			console.log('Refresh');
+			await refreshToken();
 		}
 	}
 
@@ -66,6 +85,7 @@ export function authService() {
 		});
 	}
 	return {
+		refreshToken,
 		loginWithRedirect,
 		handleRedirect,
 		logout,

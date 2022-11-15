@@ -26,7 +26,8 @@ function poll(action: () => void) {
 
 async function setNextQuestion(
 	fetchAPI: typeof fetch,
-	details: { roundNumber: number; questionNumber: number }
+	details: { roundNumber: number; questionNumber: number },
+	token: string
 ): Promise<void> {
 	await fetchAPI('/api/currentQuestion', {
 		method: 'PUT',
@@ -38,8 +39,8 @@ async function setNextQuestion(
 		})
 	});
 }
-async function getAllQuestions(): Promise<Map<number, PlanedQuestion[]>> {
-	let r = await fetch('/api/question');
+async function getAllQuestions(token: string): Promise<Map<number, PlanedQuestion[]>> {
+	let r = await fetch('/api/question', { headers: { Authorization: `Bearer ${token}` } });
 	let j = (await r.json()) as { data: { questions: PlanedQuestion[] } };
 	const questionData = j.data.questions;
 	const game = questionData.reduce((p, c) => {
@@ -52,6 +53,36 @@ async function getAllQuestions(): Promise<Map<number, PlanedQuestion[]>> {
 	return game;
 }
 
+async function submitQuestion(
+	token: string,
+	{
+		roundNumber,
+		questionNumber,
+		questionTitle,
+		questionText
+	}: {
+		roundNumber: number;
+		questionNumber: number;
+		questionTitle: string;
+		questionText: string;
+	}
+): Promise<void> {
+	await fetch('/api/question', {
+		method: 'put',
+		body: JSON.stringify({
+			data: {
+				roundNumber,
+				questionNumber,
+				questionTitle,
+				questionText
+			}
+		}),
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+}
+
 export function createService(fetchAPI: typeof fetch) {
 	const currentQuestion = writable<PlanedQuestion>(sponsorSlideQuestion);
 	onMount(() => {
@@ -62,7 +93,8 @@ export function createService(fetchAPI: typeof fetch) {
 		currentQuestionSubscribe,
 		getCurrent: () => getFromServer(fetchAPI, currentQuestion.set),
 		getAllQuestions,
-		setNext: (details: { roundNumber: number; questionNumber: number }) =>
-			setNextQuestion(fetchAPI, details)
+		submitQuestion,
+		setNext: (details: { roundNumber: number; questionNumber: number }, token: string) =>
+			setNextQuestion(fetchAPI, details, token)
 	};
 }

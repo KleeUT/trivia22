@@ -8,26 +8,34 @@
 	let token = 'No token yet';
 	const auth = authService();
 	const service = createService(fetch);
+
 	auth.user.subscribe((u) => {
 		userValue = u;
 	});
+
 	auth.token.subscribe((t) => {
 		token = t;
 	});
+
 	onMount(async () => {
+		console.log('Mount ');
 		await auth.handleRedirect();
 	});
+
 	async function login() {
 		await auth.loginWithRedirect();
 	}
+
 	async function logout() {
 		await auth.logout();
 	}
+
 	let game = new Map<number, PlanedQuestion[]>();
 	let rounds: number[] = [];
 	let round = 0;
+
 	async function getQuestions() {
-		game = await service.getAllQuestions();
+		game = await service.getAllQuestions(token);
 		rounds = Array.from(game.keys());
 		setRound(round);
 	}
@@ -41,18 +49,12 @@
 
 	async function submitQuestion(e: SubmitEvent) {
 		e.preventDefault();
-		await fetch('/api/question', {
-			method: 'put',
-			body: JSON.stringify({
-				data: {
-					roundNumber,
-					questionNumber,
-					questionTitle,
-					questionText
-				}
-			})
+		await service.submitQuestion(token, {
+			roundNumber,
+			questionNumber,
+			questionTitle,
+			questionText
 		});
-
 		await getQuestions();
 	}
 	let questions: PlanedQuestion[] = [];
