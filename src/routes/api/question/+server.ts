@@ -1,6 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import type { PlanedQuestion, Question } from 'src/types';
 import { createQuestionKey, questionPrefix } from './utils';
+import { parseJwt } from '@cfworker/jwt';
 
 export const GET = async ({ platform }: RequestEvent): Promise<Response> => {
 	const store = platform.env?.QUESTION_STORE;
@@ -17,11 +18,23 @@ export const GET = async ({ platform }: RequestEvent): Promise<Response> => {
 	return new Response(JSON.stringify({ data: { questions } }));
 };
 
-function validateRequest(
+async function validateRequest(
 	e: RequestEvent,
 	next: (e: RequestEvent) => Promise<Response>
 ): Promise<Response> {
-	return next(e);
+	const authHeader = e.request.headers.get('Authorization');
+	const issuer = 'https://klee-test.au.auth0.com/';
+	const audience = 'TheSweetestAPI';
+	if (!authHeader) {
+		return new Response('Missing auth', { status: 401 });
+	}
+	const result = await parseJwt(authHeader.substring('Bearer '.length), issuer, audience);
+	console.log(result);
+	if (!result.valid) {
+		return new Response('Invalid auth', { status: 401 });
+	} else {
+		return next(e);
+	}
 }
 
 export async function PUT(e: RequestEvent): Promise<Response> {
