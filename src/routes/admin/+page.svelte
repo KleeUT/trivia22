@@ -66,10 +66,11 @@
 
 <main>
 	<h1>Admin</h1>
-	<button on:click={login}>Login</button>
-	<button on:click={logout}>Logout</button>
-	<pre>{JSON.stringify(userValue)}</pre>
-	<pre>{token}</pre>
+	{#if token}
+		<button on:click={logout}>Logout</button>
+	{:else}
+		<button on:click={login}>Login</button>
+	{/if}
 	<hr />
 	<form on:submit={submitQuestion}>
 		<label>
