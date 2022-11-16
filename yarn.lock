@@ -7,12 +7,31 @@
   resolved "https://registry.npmjs.org/@auth0/auth0-spa-js/-/auth0-spa-js-2.0.0.tgz"
   integrity sha512-qHArgvA+ltI37g1vo3q7XtWxhMNAyL0LrnwCKCHQ1uzMWnxhdyxi2w9/BXfp1c+2L1Zc+DDh3XhpbYVXNhvadg==
 
+"@cfworker/jwt@^4.0.4":
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/@cfworker/jwt/-/jwt-4.0.4.tgz#5097cf279a31f42a26c7b3b6b2bdfa3f57ba2d84"
+  integrity sha512-CG7iyUh7IaMzxEIaRluaHu03gYHATxhorBx1sl+8BLp2hxqTnFeECZIi2GSmLEVwEn6VjhpGuH+Q/bPiOb2gcA==
+  dependencies:
+    "@cfworker/worker-types" "^1.12.3"
+    "@cloudflare/workers-types" "^2.2.2"
+    rfc4648 "^1.5.2"
+
+"@cfworker/worker-types@^1.12.3":
+  version "1.12.3"
+  resolved "https://registry.yarnpkg.com/@cfworker/worker-types/-/worker-types-1.12.3.tgz#869cc62f815fd81454f73440e4e09aad28874d06"
+  integrity sha512-p9wWxB1n+D0Mm9YFYcU80Ea9rUqYDAkuYvSPjKezCSjFKGDm12x9S/8md33h7a4IAzxtO9pfOVoVLvVI2hpR9g==
+
 "@cloudflare/kv-asset-handler@^0.2.0":
   version "0.2.0"
   resolved "https://registry.npmjs.org/@cloudflare/kv-asset-handler/-/kv-asset-handler-0.2.0.tgz"
   integrity sha512-MVbXLbTcAotOPUj0pAMhVtJ+3/kFkwJqc5qNOleOZTv6QkZZABDMS21dSrSlVswEHwrpWC03e4fWytjqKvuE2A==
   dependencies:
     mime "^3.0.0"
+
+"@cloudflare/workers-types@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workers-types/-/workers-types-2.2.2.tgz#1bced16bba801d7af987da835467545bb5cc7ac6"
+  integrity sha512-kaMn2rueJ0PL1TYVGknTCh0X0x0d9G+FNXAFep7/4uqecEZoQb/63o6rOmMuiqI09zLuHV6xhKRXinokV/MY9A==
 
 "@cloudflare/workers-types@^3.18.0":
   version "3.18.0"
@@ -2050,6 +2069,11 @@ reusify@^1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/reusify/-/reusify-1.0.4.tgz"
   integrity sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
+
+rfc4648@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/rfc4648/-/rfc4648-1.5.2.tgz#cf5dac417dd83e7f4debf52e3797a723c1373383"
+  integrity sha512-tLOizhR6YGovrEBLatX1sdcuhoSCXddw3mqNVAcKxGJ+J0hFeJ+SjeWCv5UPA/WU3YzWPPuCVYgXBKZUPGpKtg==
 
 rimraf@^2.5.2:
   version "2.7.1"
