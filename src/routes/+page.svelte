@@ -15,6 +15,7 @@
 	import ntplogo from '$lib/images/ntplogo.png';
 	import galahlogo from '$lib/images/GalahLogo.png';
 	import arrowtailLogo from '$lib/images/Arrowtail.png';
+	import saphiLogo from '$lib/images/saphi.png';
 </script>
 
 <svelte:head>
@@ -26,6 +27,7 @@
 		<img src={ntplogo} alt="Newy Tech People Logo" />
 		<img src={galahlogo} alt="Galah Cyber Logo" />
 		<img src={arrowtailLogo} alt="Arrowtail logo" />
+		<img src={saphiLogo} alt="Saphi logo" />
 	</div>
 </div>
 <section>
