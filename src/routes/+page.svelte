@@ -12,13 +12,24 @@
 		roundNumber = q.roundNumber;
 		questionNumber = q.questionNumber;
 	});
+	import ntplogo from '$lib/images/ntplogo.png';
+	import galahlogo from '$lib/images/GalahLogo.png';
+	import arrowtailLogo from '$lib/images/Arrowtail.png';
+	import saphiLogo from '$lib/images/saphi.png';
 </script>
 
 <svelte:head>
 	<title>Home</title>
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
-
+<div class="main">
+	<div class="images">
+		<img src={ntplogo} alt="Newy Tech People Logo" />
+		<img src={galahlogo} alt="Galah Cyber Logo" />
+		<img src={arrowtailLogo} alt="Arrowtail logo" />
+		<img src={saphiLogo} alt="Saphi logo" />
+	</div>
+</div>
 <section>
 	<h1>{questionTitle}</h1>
 	<h2>Round:{roundNumber} Question: {questionNumber}</h2>
@@ -26,6 +37,15 @@
 </section>
 
 <style>
+	img {
+		height: 10vh;
+	}
+	div.images {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 10vh;
+	}
 	section {
 		display: flex;
 		flex-direction: column;
