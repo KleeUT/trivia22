@@ -24,4 +24,9 @@
 		padding: 2rem;
 		border-radius: 0.5rem;
 	}
+	@media only screen and (max-width: 920px) {
+		.content {
+			width: 95%;
+		}
+	}
 </style>

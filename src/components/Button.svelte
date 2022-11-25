@@ -12,14 +12,17 @@
 
 <style>
 	button {
-		background: white;
-		border: 1px solid blue;
-		color: blue;
+		padding: 0.5rem;
+		background: darkred;
 		cursor: pointer;
-		border-radius: 3px;
+		color: white;
+		border-radius: 0.5rem;
+		padding-left: 1rem;
+		padding-right: 1rem;
 	}
 	button.large {
 		padding: 1rem;
-		border: 2px solid blue;
+		padding-right: 1.5rem;
+		padding-left: 1.5rem;
 	}
 </style>
