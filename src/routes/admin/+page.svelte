@@ -4,6 +4,9 @@
 	import type { PlanedQuestion } from 'src/types';
 	import QuestionList from './QuestionList.svelte';
 	import { createService } from '../questionService';
+	import Button from '../../components/Button.svelte';
+	import EditQuestion from './EditQuestion.svelte';
+	import PreviewQuestion from './PreviewQuestion.svelte';
 	let userValue: Object | undefined;
 	let token = 'No token yet';
 	const auth = authService();
@@ -42,77 +45,88 @@
 
 	getQuestions();
 
-	let questionTitle = '';
-	let questionText = '';
-	let roundNumber = 0;
-	let questionNumber = 0;
-
-	async function submitQuestion(e: SubmitEvent) {
-		e.preventDefault();
+	async function submitQuestion() {
 		await service.submitQuestion(token, {
-			roundNumber,
-			questionNumber,
-			questionTitle,
-			questionText
+			roundNumber: selectedRoundNumber,
+			questionNumber: selectedQuestionNumber,
+			questionTitle: selectedQuestionTitle,
+			questionText: selectedQuestionText
 		});
 		await getQuestions();
+		editOpen = false;
 	}
 	let questions: PlanedQuestion[] = [];
 	function setRound(r: number): void {
 		round = r;
 		questions = game.get(r) || [];
 	}
+	let editOpen = false;
+
+	let previewOpen = false;
+	let selectedRoundNumber = 0;
+	let selectedQuestionNumber = 0;
+	let selectedQuestionTitle = '';
+	let selectedQuestionText = '';
+
+	function openEdit(e: CustomEvent<PlanedQuestion>) {
+		const question = e.detail;
+		selectedRoundNumber = question.roundNumber;
+		selectedQuestionNumber = question.questionNumber;
+		selectedQuestionTitle = question.question.questionTitle;
+		selectedQuestionText = question.question.questionText;
+		editOpen = true;
+	}
+	function openPreview(e: CustomEvent<PlanedQuestion>) {
+		const question = e.detail;
+		selectedRoundNumber = question.roundNumber;
+		selectedQuestionNumber = question.questionNumber;
+		selectedQuestionTitle = question.question.questionTitle;
+		selectedQuestionText = question.question.questionText;
+		previewOpen = true;
+	}
+	function openNew(e: CustomEvent<PlanedQuestion>) {
+		const round = Math.max(game.size - 1, 0);
+		selectedRoundNumber = round;
+		selectedQuestionNumber = game.get(round)?.length || 0;
+		selectedQuestionTitle = '';
+		selectedQuestionText = '';
+		editOpen = true;
+	}
 </script>
 
 <main>
 	<h1>Admin</h1>
 	{#if token}
-		<button on:click={logout}>Logout</button>
+		<Button on:click={logout}>Logout</Button>
 	{:else}
-		<button on:click={login}>Login</button>
+		<Button on:click={login}>Login</Button>
 	{/if}
 	<hr />
-	<form on:submit={submitQuestion}>
-		<label>
-			Round:
-			<input type="number" bind:value={roundNumber} />
-		</label>
-		<label>
-			Question Number:
-			<input type="number" bind:value={questionNumber} />
-		</label>
-		<label>
-			Title:
-			<input class="full-width" type="text" bind:value={questionTitle} />
-		</label>
-		<label>
-			Text
-			<textarea class="full-width" bind:value={questionText} />
-		</label>
-		<button type="submit">Add</button>
-	</form>
+	<Button on:click={openNew}>New</Button>
 	<hr />
 	{#each rounds as round}
-		<button on:click={() => setRound(round)}>{round}</button>
+		<Button on:click={() => setRound(round)}>{round}</Button>
 	{/each}
-	<QuestionList {questions} />
+	<QuestionList {questions} on:preview={openPreview} on:edit={openEdit} />
 </main>
+{#if editOpen}
+	<EditQuestion
+		bind:roundNumber={selectedRoundNumber}
+		bind:questionNumber={selectedQuestionNumber}
+		bind:questionTitle={selectedQuestionTitle}
+		bind:questionText={selectedQuestionText}
+		on:close={() => (editOpen = false)}
+		on:save={() => submitQuestion()}
+	/>
+{:else if previewOpen}
+	<PreviewQuestion
+		on:close={() => (previewOpen = false)}
+		roundNumber={selectedRoundNumber}
+		questionNumber={selectedQuestionNumber}
+		questionTitle={selectedQuestionTitle}
+		questionText={selectedQuestionText}
+	/>
+{/if}
 
 <style>
-	label {
-		display: block;
-	}
-	.full-width {
-		width: 100%;
-	}
-	textarea {
-		height: 10rem;
-	}
-	button {
-		padding: 0.5rem;
-		background: white;
-		border: 1px solid blue;
-		color: blue;
-		cursor: pointer;
-	}
 </style>
