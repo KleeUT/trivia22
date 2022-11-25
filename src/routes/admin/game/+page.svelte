@@ -1,7 +1,13 @@
 <script lang="ts">
+	import { authService } from '$lib/auth/authService';
 	import SvelteMarkdown from 'svelte-markdown';
 	import { createService } from '../../questionService';
 	import RoundControls from './RoundControls.svelte';
+	let auth = authService();
+	let token = '';
+	auth.token.subscribe((t) => {
+		token = t;
+	});
 	let questionText = '';
 	let questionTitle = '';
 	let roundNumber = 0;
@@ -15,7 +21,7 @@
 	});
 </script>
 
-<RoundControls round={roundNumber} question={questionNumber} {questionService} />
+<RoundControls round={roundNumber} question={questionNumber} {questionService} {token} />
 
 <hr />
 <h1>{questionTitle}</h1>

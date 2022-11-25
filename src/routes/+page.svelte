@@ -20,7 +20,7 @@
 
 <svelte:head>
 	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<meta name="description" content="Newwwie Trivia 2022" />
 </svelte:head>
 <div class="main">
 	<div class="images">
