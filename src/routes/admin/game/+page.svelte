@@ -2,14 +2,14 @@
 	import { authService } from '$lib/auth/authService';
 	import Button from '../../../components/Button.svelte';
 	import Modal from '../../../components/Modal.svelte';
-	import type { PlanedQuestion } from 'src/types';
+	import type { PlannedQuestion } from 'src/types';
 	import { onMount } from 'svelte';
 	import SvelteMarkdown from 'svelte-markdown';
 	import { createService } from '../../questionService';
 	import RoundControls from './RoundControls.svelte';
 	const auth = authService();
 	const questionService = createService(fetch);
-	let allQuestions: Map<number, PlanedQuestion[]> = new Map();
+	let allQuestions: Map<number, PlannedQuestion[]> = new Map();
 
 	let token = '';
 	auth.token.subscribe((t) => {
@@ -46,7 +46,9 @@
 	}
 </script>
 
-<RoundControls allRounds={Array.from(allQuestions.keys())} on:roundSet={setRound} />
+{#if token}
+	<RoundControls allRounds={Array.from(allQuestions.keys())} on:roundSet={setRound} />
+{/if}
 {#if roundViewOpen}
 	<Modal>
 		<div class="control-block">
@@ -55,7 +57,10 @@
 		</div>
 		<hr />
 		<h1>{questionTitle}</h1>
-		<h2>Round:{roundNumber} Question: {questionNumber}</h2>
+		<h2>
+			Round:{roundNumber} Question: {questionNumber} / {(allQuestions.get(roundNumber)?.length ||
+				0) - 1}
+		</h2>
 		<SvelteMarkdown source={questionText} />
 		<hr />
 		<Button on:click={() => (roundViewOpen = false)}>Close</Button>

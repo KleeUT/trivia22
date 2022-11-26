@@ -1,11 +1,11 @@
-import type { PlanedQuestion } from 'src/types';
+import type { PlannedQuestion } from 'src/types';
 import { onMount } from 'svelte';
 import { writable } from 'svelte/store';
 import { sponsorSlideQuestion } from './sponsorSlide';
 
 async function getFromServer(
 	fetchAPI: typeof fetch,
-	set: (question: PlanedQuestion) => void
+	set: (question: PlannedQuestion) => void
 ): Promise<void> {
 	const fetchResponse = await fetchAPI('/api/currentQuestion');
 	if (!fetchResponse.ok || fetchResponse.status >= 400) {
@@ -13,7 +13,7 @@ async function getFromServer(
 		console.error({ status: fetchResponse.status, res });
 		return;
 	}
-	const body = (await fetchResponse.json()) as { data: { currentQuestion: PlanedQuestion } };
+	const body = (await fetchResponse.json()) as { data: { currentQuestion: PlannedQuestion } };
 	set(body.data.currentQuestion);
 }
 
@@ -36,19 +36,22 @@ async function setNextQuestion(
 				roundNumber: details.roundNumber,
 				questionNumber: details.questionNumber
 			}
-		})
+		}),
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
 	});
 }
-async function getAllQuestions(token: string): Promise<Map<number, PlanedQuestion[]>> {
+async function getAllQuestions(token: string): Promise<Map<number, PlannedQuestion[]>> {
 	let r = await fetch('/api/question', { headers: { Authorization: `Bearer ${token}` } });
-	let j = (await r.json()) as { data: { questions: PlanedQuestion[] } };
+	let j = (await r.json()) as { data: { questions: PlannedQuestion[] } };
 	const questionData = j.data.questions;
 	const game = questionData.reduce((p, c) => {
 		const round = p.get(c.roundNumber) || [];
 		round.push(c);
 		p.set(c.roundNumber, round);
 		return p;
-	}, new Map<number, PlanedQuestion[]>());
+	}, new Map<number, PlannedQuestion[]>());
 
 	return game;
 }
@@ -83,8 +86,52 @@ async function submitQuestion(
 	});
 }
 
+async function deleteQuestion(
+	fetchAPI: typeof fetch,
+	token: string,
+	{ roundNumber, questionNumber }: { roundNumber: number; questionNumber: number }
+): Promise<void> {
+	await fetchAPI('/api/question', {
+		method: 'delete',
+		body: JSON.stringify({
+			data: {
+				roundNumber,
+				questionNumber
+			}
+		}),
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+}
+
+async function swapQuestions(
+	fetchAPI: typeof fetch,
+	token: string,
+	{
+		questionOne,
+		questionTwo
+	}: {
+		questionOne: { roundNumber: number; questionNumber: number };
+		questionTwo: { roundNumber: number; questionNumber: number };
+	}
+): Promise<void> {
+	await fetchAPI('/api/question/reposition', {
+		method: 'post',
+		body: JSON.stringify({
+			data: {
+				questionOne,
+				questionTwo
+			}
+		}),
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+}
+
 export function createService(fetchAPI: typeof fetch) {
-	const currentQuestion = writable<PlanedQuestion>(sponsorSlideQuestion);
+	const currentQuestion = writable<PlannedQuestion>(sponsorSlideQuestion);
 	onMount(() => {
 		poll(() => getFromServer(fetchAPI, currentQuestion.set));
 	});
@@ -94,7 +141,16 @@ export function createService(fetchAPI: typeof fetch) {
 		getCurrent: () => getFromServer(fetchAPI, currentQuestion.set),
 		getAllQuestions,
 		submitQuestion,
+		deleteQuestion: (token: string, details: { roundNumber: number; questionNumber: number }) =>
+			deleteQuestion(fetchAPI, token, details),
 		setNext: (details: { roundNumber: number; questionNumber: number }, token: string) =>
-			setNextQuestion(fetchAPI, details, token)
+			setNextQuestion(fetchAPI, details, token),
+		swapQuestions: (
+			token: string,
+			questions: {
+				questionOne: { roundNumber: number; questionNumber: number };
+				questionTwo: { roundNumber: number; questionNumber: number };
+			}
+		) => swapQuestions(fetchAPI, token, questions)
 	};
 }
