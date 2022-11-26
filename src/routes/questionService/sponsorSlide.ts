@@ -1,6 +1,6 @@
-import type { PlanedQuestion } from 'src/types';
+import type { PlannedQuestion } from 'src/types';
 
-export const sponsorSlideQuestion: PlanedQuestion = {
+export const sponsorSlideQuestion: PlannedQuestion = {
 	roundNumber: 0,
 	questionNumber: 0,
 	question: {

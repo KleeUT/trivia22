@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import type { PlanedQuestion, Question } from 'src/types';
+import type { PlannedQuestion, Question } from 'src/types';
+import { validateRequest } from '../requestValidator';
 import { createQuestionKey, questionPrefix } from './utils';
-import { parseJwt } from '@cfworker/jwt';
 
 export const GET = async ({ platform }: RequestEvent): Promise<Response> => {
 	const store = platform.env?.QUESTION_STORE;
@@ -18,25 +18,6 @@ export const GET = async ({ platform }: RequestEvent): Promise<Response> => {
 	return new Response(JSON.stringify({ data: { questions } }));
 };
 
-async function validateRequest(
-	e: RequestEvent,
-	next: (e: RequestEvent) => Promise<Response>
-): Promise<Response> {
-	const authHeader = e.request.headers.get('Authorization');
-	const issuer = 'https://klee-test.au.auth0.com/';
-	const audience = 'TheSweetestAPI';
-	if (!authHeader) {
-		return new Response('Missing auth', { status: 401 });
-	}
-	const result = await parseJwt(authHeader.substring('Bearer '.length), issuer, audience);
-	console.log(result);
-	if (!result.valid) {
-		return new Response('Invalid auth', { status: 401 });
-	} else {
-		return next(e);
-	}
-}
-
 export async function PUT(e: RequestEvent): Promise<Response> {
 	return await validateRequest(
 		e,
@@ -50,16 +31,38 @@ export async function PUT(e: RequestEvent): Promise<Response> {
 				};
 			};
 			const { questionText, questionTitle, roundNumber, questionNumber } = body.data;
-			const newPlanedQuestion: PlanedQuestion = {
+			const newPlannedQuestion: PlannedQuestion = {
 				question: { questionText, questionTitle },
 				roundNumber,
 				questionNumber
 			};
 			await platform.env?.QUESTION_STORE.put(
 				createQuestionKey({ questionNumber, roundNumber }),
-				JSON.stringify(newPlanedQuestion)
+				JSON.stringify(newPlannedQuestion)
 			);
-			return new Response(JSON.stringify({ data: { newPlanedQuestion } }), { status: 200 });
+			return new Response(JSON.stringify({ data: { newPlannedQuestion } }), { status: 200 });
+		}
+	);
+}
+
+export async function DELETE(e: RequestEvent): Promise<Response> {
+	return await validateRequest(
+		e,
+		async ({ request, platform }: RequestEvent): Promise<Response> => {
+			const body = (await request.json()) as {
+				data: {
+					roundNumber: number;
+					questionNumber: number;
+				};
+			};
+			await platform.env?.QUESTION_STORE.delete(
+				createQuestionKey({
+					roundNumber: body.data.roundNumber,
+					questionNumber: body.data.questionNumber
+				})
+			);
+
+			return new Response(JSON.stringify({ data: {} }), { status: 200 });
 		}
 	);
 }

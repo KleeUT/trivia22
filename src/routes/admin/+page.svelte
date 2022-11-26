@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { authService } from '../../lib/auth/authService';
-	import type { PlanedQuestion } from 'src/types';
+	import type { PlannedQuestion } from 'src/types';
 	import QuestionList from './QuestionList.svelte';
 	import { createService } from '../questionService';
 	import Button from '../../components/Button.svelte';
@@ -33,7 +33,7 @@
 		await auth.logout();
 	}
 
-	let game = new Map<number, PlanedQuestion[]>();
+	let game = new Map<number, PlannedQuestion[]>();
 	let rounds: number[] = [];
 	let round = 0;
 
@@ -55,7 +55,7 @@
 		await getQuestions();
 		editOpen = false;
 	}
-	let questions: PlanedQuestion[] = [];
+	let questions: PlannedQuestion[] = [];
 	function setRound(r: number): void {
 		round = r;
 		questions = game.get(r) || [];
@@ -68,7 +68,7 @@
 	let selectedQuestionTitle = '';
 	let selectedQuestionText = '';
 
-	function openEdit(e: CustomEvent<PlanedQuestion>) {
+	function openEdit(e: CustomEvent<PlannedQuestion>) {
 		const question = e.detail;
 		selectedRoundNumber = question.roundNumber;
 		selectedQuestionNumber = question.questionNumber;
@@ -76,7 +76,7 @@
 		selectedQuestionText = question.question.questionText;
 		editOpen = true;
 	}
-	function openPreview(e: CustomEvent<PlanedQuestion>) {
+	function openPreview(e: CustomEvent<PlannedQuestion>) {
 		const question = e.detail;
 		selectedRoundNumber = question.roundNumber;
 		selectedQuestionNumber = question.questionNumber;
@@ -84,7 +84,7 @@
 		selectedQuestionText = question.question.questionText;
 		previewOpen = true;
 	}
-	function openNew(e: CustomEvent<PlanedQuestion>) {
+	function openNew(e: CustomEvent<PlannedQuestion>) {
 		const round = Math.max(game.size - 1, 0);
 		selectedRoundNumber = round;
 		selectedQuestionNumber = game.get(round)?.length || 0;
@@ -92,22 +92,56 @@
 		selectedQuestionText = '';
 		editOpen = true;
 	}
+	async function onDelete(e: CustomEvent<PlannedQuestion>): Promise<void> {
+		await service.deleteQuestion(token, {
+			questionNumber: e.detail.questionNumber,
+			roundNumber: e.detail.roundNumber
+		});
+		await getQuestions();
+	}
+	async function onUp(e: CustomEvent<PlannedQuestion>): Promise<void> {
+		await service.swapQuestions(token, {
+			questionOne: { questionNumber: e.detail.questionNumber, roundNumber: e.detail.roundNumber },
+			questionTwo: {
+				questionNumber: e.detail.questionNumber - 1,
+				roundNumber: e.detail.roundNumber
+			}
+		});
+		await getQuestions();
+	}
+	async function onDown(e: CustomEvent<PlannedQuestion>): Promise<void> {
+		await service.swapQuestions(token, {
+			questionOne: { questionNumber: e.detail.questionNumber, roundNumber: e.detail.roundNumber },
+			questionTwo: {
+				questionNumber: e.detail.questionNumber + 1,
+				roundNumber: e.detail.roundNumber
+			}
+		});
+		await getQuestions();
+	}
 </script>
 
 <main>
 	<h1>Admin</h1>
-	{#if token}
-		<Button on:click={logout}>Logout</Button>
-	{:else}
+	{#if !token}
 		<Button on:click={login}>Login</Button>
+	{:else}
+		<Button on:click={logout}>Logout</Button>
+		<hr />
+		<Button on:click={openNew}>New</Button>
+		<hr />
+		{#each rounds as round}
+			<Button on:click={() => setRound(round)}>{round}</Button>
+		{/each}
+		<QuestionList
+			{questions}
+			on:preview={openPreview}
+			on:edit={openEdit}
+			on:delete={onDelete}
+			on:moveDown={onDown}
+			on:moveUp={onUp}
+		/>
 	{/if}
-	<hr />
-	<Button on:click={openNew}>New</Button>
-	<hr />
-	{#each rounds as round}
-		<Button on:click={() => setRound(round)}>{round}</Button>
-	{/each}
-	<QuestionList {questions} on:preview={openPreview} on:edit={openEdit} />
 </main>
 {#if editOpen}
 	<EditQuestion
