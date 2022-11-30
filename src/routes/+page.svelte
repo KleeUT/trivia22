@@ -5,12 +5,14 @@
 	let questionTitle = '';
 	let roundNumber = 0;
 	let questionNumber = 0;
+	let points = 0;
 	const store = createService(fetch);
 	store.currentQuestionSubscribe((q) => {
 		questionText = q.question.questionText;
 		questionTitle = q.question.questionTitle;
 		roundNumber = q.roundNumber;
 		questionNumber = q.questionNumber;
+		points = q.question.points;
 	});
 	import ntplogo from '$lib/images/ntplogo.png';
 	import galahlogo from '$lib/images/GalahLogo.png';
@@ -31,8 +33,9 @@
 	</div>
 </div>
 <section>
+	<h3>Round:{roundNumber} Question: {questionNumber}</h3>
+	<h2>Points: {points}</h2>
 	<h1>{questionTitle}</h1>
-	<h2>Round:{roundNumber} Question: {questionNumber}</h2>
 	<SvelteMarkdown source={questionText} />
 </section>
 

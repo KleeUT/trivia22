@@ -32,6 +32,7 @@ body {
 
 h1,
 h2,
+h3,
 p {
 	font-weight: 400;
 }
@@ -56,6 +57,10 @@ h1 {
 
 h2 {
 	font-size: 1rem;
+}
+
+h3 {
+	font-size: 0.8rem;
 }
 
 pre {
@@ -91,6 +96,13 @@ button:focus:not(:focus-visible) {
 @media (min-width: 720px) {
 	h1 {
 		font-size: 2.4rem;
+	}
+	h2 {
+		font-size: 1.2rem;
+	}
+
+	h3 {
+		font-size: 1rem;
 	}
 }
 

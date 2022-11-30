@@ -19,11 +19,13 @@
 	let questionTitle = '';
 	let roundNumber = 0;
 	let questionNumber = 0;
+	let points = 0;
 	questionService.currentQuestionSubscribe((q) => {
 		questionText = q.question.questionText;
 		questionTitle = q.question.questionTitle;
 		roundNumber = q.roundNumber;
 		questionNumber = q.questionNumber;
+		points = q.question.points;
 	});
 
 	onMount(async () => {
@@ -59,7 +61,7 @@
 		<h1>{questionTitle}</h1>
 		<h2>
 			Round:{roundNumber} Question: {questionNumber} / {(allQuestions.get(roundNumber)?.length ||
-				0) - 1}
+				0) - 1} Points: {points}
 		</h2>
 		<SvelteMarkdown source={questionText} />
 		<hr />

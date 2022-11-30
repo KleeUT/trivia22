@@ -62,12 +62,14 @@ async function submitQuestion(
 		roundNumber,
 		questionNumber,
 		questionTitle,
-		questionText
+		questionText,
+		points
 	}: {
 		roundNumber: number;
 		questionNumber: number;
 		questionTitle: string;
 		questionText: string;
+		points: number;
 	}
 ): Promise<void> {
 	await fetch('/api/question', {
@@ -77,7 +79,8 @@ async function submitQuestion(
 				roundNumber,
 				questionNumber,
 				questionTitle,
-				questionText
+				questionText,
+				points
 			}
 		}),
 		headers: {

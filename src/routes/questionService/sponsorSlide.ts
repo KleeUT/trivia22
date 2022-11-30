@@ -9,6 +9,7 @@ export const sponsorSlideQuestion: PlannedQuestion = {
 * Galah Cyber
 * ArrowTail
     `,
-		questionTitle: 'Please thank our sponsors'
+		questionTitle: 'Please thank our sponsors',
+		points: 0
 	}
 };

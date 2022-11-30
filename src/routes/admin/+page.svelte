@@ -50,7 +50,8 @@
 			roundNumber: selectedRoundNumber,
 			questionNumber: selectedQuestionNumber,
 			questionTitle: selectedQuestionTitle,
-			questionText: selectedQuestionText
+			questionText: selectedQuestionText,
+			points
 		});
 		await getQuestions();
 		editOpen = false;
@@ -67,6 +68,7 @@
 	let selectedQuestionNumber = 0;
 	let selectedQuestionTitle = '';
 	let selectedQuestionText = '';
+	let points = 0;
 
 	function openEdit(e: CustomEvent<PlannedQuestion>) {
 		const question = e.detail;
@@ -74,6 +76,7 @@
 		selectedQuestionNumber = question.questionNumber;
 		selectedQuestionTitle = question.question.questionTitle;
 		selectedQuestionText = question.question.questionText;
+		points = question.question.points;
 		editOpen = true;
 	}
 	function openPreview(e: CustomEvent<PlannedQuestion>) {
@@ -82,6 +85,8 @@
 		selectedQuestionNumber = question.questionNumber;
 		selectedQuestionTitle = question.question.questionTitle;
 		selectedQuestionText = question.question.questionText;
+		points = question.question.points;
+
 		previewOpen = true;
 	}
 	function openNew(e: CustomEvent<PlannedQuestion>) {
@@ -90,6 +95,7 @@
 		selectedQuestionNumber = game.get(round)?.length || 0;
 		selectedQuestionTitle = '';
 		selectedQuestionText = '';
+		points = 0;
 		editOpen = true;
 	}
 	async function onDelete(e: CustomEvent<PlannedQuestion>): Promise<void> {
@@ -149,6 +155,7 @@
 		bind:questionNumber={selectedQuestionNumber}
 		bind:questionTitle={selectedQuestionTitle}
 		bind:questionText={selectedQuestionText}
+		bind:points
 		on:close={() => (editOpen = false)}
 		on:save={() => submitQuestion()}
 	/>
@@ -159,6 +166,7 @@
 		questionNumber={selectedQuestionNumber}
 		questionTitle={selectedQuestionTitle}
 		questionText={selectedQuestionText}
+		{points}
 	/>
 {/if}
 
