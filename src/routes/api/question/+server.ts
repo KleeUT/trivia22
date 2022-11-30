@@ -28,11 +28,12 @@ export async function PUT(e: RequestEvent): Promise<Response> {
 					questionNumber: number;
 					questionTitle: string;
 					questionText: string;
+					points: number;
 				};
 			};
-			const { questionText, questionTitle, roundNumber, questionNumber } = body.data;
+			const { questionText, questionTitle, roundNumber, questionNumber, points } = body.data;
 			const newPlannedQuestion: PlannedQuestion = {
-				question: { questionText, questionTitle },
+				question: { questionText, questionTitle, points },
 				roundNumber,
 				questionNumber
 			};

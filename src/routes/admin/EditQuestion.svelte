@@ -5,6 +5,7 @@
 
 	export let roundNumber: number;
 	export let questionNumber: number;
+	export let points: number;
 	export let questionTitle: string;
 	export let questionText: string;
 
@@ -38,6 +39,10 @@
 			<label>
 				Text
 				<textarea class="full-width" bind:value={questionText} />
+			</label>
+			<label>
+				Points:
+				<input type="number" bind:value={points} />
 			</label>
 		</form>
 		<hr />

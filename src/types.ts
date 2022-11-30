@@ -6,4 +6,5 @@ export interface PlannedQuestion {
 export interface Question {
 	questionText: string;
 	questionTitle: string;
+	points: number;
 }

@@ -7,6 +7,7 @@
 	const dispatch = createEventDispatcher();
 	export let roundNumber: number;
 	export let questionNumber: number;
+	export let points: number;
 	export let questionTitle: string;
 	export let questionText: string;
 	function onClose() {
@@ -16,7 +17,7 @@
 
 <Modal>
 	<h1>{questionTitle}</h1>
-	<h2>Round:{roundNumber} Question: {questionNumber}</h2>
+	<h2>Round:{roundNumber} Question: {questionNumber} Points: {points}</h2>
 	<SvelteMarkdown source={questionText} />
 	<hr />
 	<Button on:click={onClose}>Close</Button>

@@ -17,7 +17,9 @@
 <h2>{roundNumber}</h2>
 {#each questions as question}
 	<div>
-		<h3>{question.questionNumber} - {question.question.questionTitle}</h3>
+		<h3>
+			[{question.question.points}] {question.questionNumber} - {question.question.questionTitle}
+		</h3>
 		<Button on:click={() => onEdit(question)}>Edit</Button>
 		<Button on:click={() => onPreview(question)}>Preview</Button>
 		<Button on:click={() => onDelete(question)}>{' - '}</Button>
