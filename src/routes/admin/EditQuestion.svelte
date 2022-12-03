@@ -49,11 +49,11 @@
 		<hr />
 		<Button on:click={onClose}>Close</Button>
 		<Button type="submit" on:click={onSave}>Save</Button>
+		<hr />
+		<h1>{questionTitle}</h1>
+		<h2>Round:{roundNumber} Question: {questionNumber} Points: {points}</h2>
+		<SvelteMarkdown source={questionText} />
 	</div>
-	<hr />
-	<h1>{questionTitle}</h1>
-	<h2>Round:{roundNumber} Question: {questionNumber} Points: {points}</h2>
-	<SvelteMarkdown source={questionText} />
 </div>
 
 <style>
