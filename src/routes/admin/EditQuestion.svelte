@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '../../components/Button.svelte';
 	import { createEventDispatcher } from 'svelte';
+	import SvelteMarkdown from 'svelte-markdown';
 	const dispatch = createEventDispatcher();
 
 	export let roundNumber: number;
@@ -49,6 +50,10 @@
 		<Button on:click={onClose}>Close</Button>
 		<Button type="submit" on:click={onSave}>Save</Button>
 	</div>
+	<hr />
+	<h1>{questionTitle}</h1>
+	<h2>Round:{roundNumber} Question: {questionNumber} Points: {points}</h2>
+	<SvelteMarkdown source={questionText} />
 </div>
 
 <style>
