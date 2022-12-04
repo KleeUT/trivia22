@@ -38,7 +38,10 @@ export async function GET({ platform }: RequestEvent): Promise<Response> {
 					message: err.message,
 					stack: err.stack,
 					env: platform.env,
-					ctx: platform.context
+					ctx: platform.context,
+					dbStoreKeys: Object.keys(
+						platform.env?.CURRENT_QUESTION_DB || platform.env?.__D1_BETA__CURRENT_QUESTION_DB!
+					)
 				}),
 				{
 					status: 500
