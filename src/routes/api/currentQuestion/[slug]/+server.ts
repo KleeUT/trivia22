@@ -4,7 +4,7 @@ function addNoCacheHeader(response: Response): Response {
 	try {
 		const headers: Headers = response.headers || new Headers();
 		headers.append('Cache-Control', 'no-cache');
-		return new Response(response.body, { headers });
+		return new Response(response.body, { headers, status: response.status });
 	} catch (e) {
 		console.error(e);
 		throw e;
@@ -32,9 +32,18 @@ export async function GET({ platform }: RequestEvent): Promise<Response> {
 	} catch (e) {
 		const err = e as Error;
 		return addNoCacheHeader(
-			new Response(JSON.stringify({ err, message: err.message, stack: err.stack }), {
-				status: 500
-			})
+			new Response(
+				JSON.stringify({
+					err,
+					message: err.message,
+					stack: err.stack,
+					env: platform.env,
+					ctx: platform.context
+				}),
+				{
+					status: 500
+				}
+			)
 		);
 	}
 }
