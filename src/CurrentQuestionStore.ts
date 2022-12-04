@@ -1,4 +1,4 @@
-import type { PlannedQuestion } from './src/types';
+import type { PlannedQuestion } from './types';
 
 interface Env {}
 
