@@ -13,7 +13,7 @@ function addNoCacheHeader(response: Response): Response {
 
 export async function GET({ platform }: RequestEvent): Promise<Response> {
 	try {
-		const db = platform.env?.CURRENT_QUESTION_DB!;
+		const db = platform.env?.CURRENT_QUESTION_DB || platform.env?.__D1_BETA__CURRENT_QUESTION_DB!;
 		const stmt = db.prepare('SELECT * FROM CurrentQuestion');
 		const { results, error, duration } = await stmt.all<{ id: number; question: string }>();
 		if (!results || results.length === 0) {

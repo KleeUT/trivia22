@@ -69,9 +69,11 @@ export async function PUT(e: RequestEvent): Promise<Response> {
 					);
 				}
 				const question = JSON.parse(q) as Question;
-				const stmt = platform.env?.CURRENT_QUESTION_DB.prepare(
-					'INSERT INTO CurrentQuestion (id, question) VALUES(?1,?1'
-				).bind(Date.now(), JSON.stringify(question));
+				const db =
+					platform.env?.CURRENT_QUESTION_DB || platform.env?.__D1_BETA__CURRENT_QUESTION_DB!;
+				const stmt = db
+					?.prepare('INSERT INTO CurrentQuestion (id, question) VALUES(?1,?1')
+					.bind(Date.now(), JSON.stringify(question));
 				const result = await stmt?.run();
 				let duration = 0;
 				let err: string | undefined;

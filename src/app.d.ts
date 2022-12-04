@@ -8,6 +8,7 @@ declare namespace App {
 		env?: {
 			QUESTION_STORE: KVNamespace;
 			CURRENT_QUESTION_DB: D1Database;
+			__D1_BETA__CURRENT_QUESTION_DB: D1Database;
 		};
 	}
 }
