@@ -14,7 +14,7 @@ function addNoCacheHeader(response: Response): Response {
 export async function GET({ platform }: RequestEvent): Promise<Response> {
 	const db = platform.env?.CURRENT_QUESTION_DB!;
 	const stmt = db.prepare('SELECT * FROM CurrentQuestion');
-	const { results } = await stmt.all<{ id: number; question: string }>();
+	const { results, error, duration } = await stmt.all<{ id: number; question: string }>();
 	if (!results || results.length === 0) {
 		return addNoCacheHeader(new Response('No current question found', { status: 404 }));
 	}
