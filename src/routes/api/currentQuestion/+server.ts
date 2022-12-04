@@ -7,14 +7,28 @@ const currentQuestionPrefix = 'currentQuestion';
 const currentQuestionDelimiter = '|';
 const currentQuestionKey = (time: Date) =>
 	`${currentQuestionPrefix}${currentQuestionDelimiter}${time.valueOf()}`;
+
+function addNoCacheHeader(response: Response): Response {
+	try {
+		const headers: Headers = response.headers || new Headers();
+		headers.append('Cache-Control', 'no-cache');
+		return new Response(response.body, { headers });
+	} catch (e) {
+		console.error(e);
+		throw e;
+	}
+}
+
 export async function GET({ platform }: RequestEvent): Promise<Response> {
 	let rawData = 'not set';
 	try {
 		const keyResult = await platform.env?.QUESTION_STORE.list({ prefix: currentQuestionPrefix });
 		if (!keyResult) {
-			return new Response(JSON.stringify({ err: { message: 'No current question' } }), {
-				status: 404
-			});
+			return addNoCacheHeader(
+				new Response(JSON.stringify({ err: { message: 'No current question' } }), {
+					status: 404
+				})
+			);
 		}
 		const keys = Array.from(keyResult.keys).map((key) => {
 			return {
@@ -26,18 +40,24 @@ export async function GET({ platform }: RequestEvent): Promise<Response> {
 		const [latestKey] = keys;
 		const currentQuestion = await platform.env?.QUESTION_STORE.get(latestKey.key, 'text');
 		if (!currentQuestion) {
-			return new Response(JSON.stringify({ err: { message: 'No current question' } }), {
-				status: 404
-			});
+			return addNoCacheHeader(
+				new Response(JSON.stringify({ err: { message: 'No current question' } }), {
+					status: 404
+				})
+			);
 		}
 		rawData = currentQuestion;
 		const question = JSON.parse(currentQuestion) as PlannedQuestion;
-		return new Response(JSON.stringify({ data: { currentQuestion: question } }), { status: 200 });
+		return addNoCacheHeader(
+			new Response(JSON.stringify({ data: { currentQuestion: question } }), { status: 200 })
+		);
 	} catch (e) {
 		const err = e as Error;
-		return new Response(
-			JSON.stringify({ err: { message: err.message, stack: err.stack }, data: rawData }),
-			{ status: 500 }
+		return addNoCacheHeader(
+			new Response(
+				JSON.stringify({ err: { message: err.message, stack: err.stack }, data: rawData }),
+				{ status: 500 }
+			)
 		);
 	}
 }
@@ -80,12 +100,14 @@ export async function PUT(e: RequestEvent): Promise<Response> {
 				'text'
 			);
 			if (!q) {
-				return new Response(
-					JSON.stringify({
-						err: {
-							message: `no question round:${body.data.roundNumber} question:${body.data.questionNumber}`
-						}
-					})
+				return addNoCacheHeader(
+					new Response(
+						JSON.stringify({
+							err: {
+								message: `no question round:${body.data.roundNumber} question:${body.data.questionNumber}`
+							}
+						})
+					)
 				);
 			}
 
@@ -95,7 +117,9 @@ export async function PUT(e: RequestEvent): Promise<Response> {
 				platform.env?.QUESTION_STORE.put(currentQuestionKey(new Date()), JSON.stringify(question)),
 				deleteOldCurrentQuestions(platform)
 			]);
-			return new Response(JSON.stringify({ data: { question } }), { status: 200 });
+			return addNoCacheHeader(
+				new Response(JSON.stringify({ data: { question } }), { status: 200 })
+			);
 		}
 	);
 }
