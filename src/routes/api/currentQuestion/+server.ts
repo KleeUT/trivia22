@@ -89,7 +89,7 @@ export async function PUT(e: RequestEvent): Promise<Response> {
 			} catch (e) {
 				const err = e as Error;
 				return addNoCacheHeader(
-					new Response(JSON.stringify({ err, message: err.message, stack: e.stack }), {
+					new Response(JSON.stringify({ err, message: err.message, stack: err.stack }), {
 						status: 500
 					})
 				);
