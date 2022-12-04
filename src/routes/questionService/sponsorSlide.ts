@@ -8,6 +8,7 @@ export const sponsorSlideQuestion: PlannedQuestion = {
 * Newy Tech People
 * Galah Cyber
 * ArrowTail
+* Saphi engineering
     `,
 		questionTitle: 'Please thank our sponsors',
 		points: 0
