@@ -19,49 +19,6 @@ function addNoCacheHeader(response: Response): Response {
 	}
 }
 
-export async function GET({ platform }: RequestEvent): Promise<Response> {
-	let rawData = 'not set';
-	try {
-		const keyResult = await platform.env?.QUESTION_STORE.list({ prefix: currentQuestionPrefix });
-		if (!keyResult) {
-			return addNoCacheHeader(
-				new Response(JSON.stringify({ err: { message: 'No current question' } }), {
-					status: 404
-				})
-			);
-		}
-		const keys = Array.from(keyResult.keys).map((key) => {
-			return {
-				key: key.name,
-				time: key.name.substring(key.name.indexOf(currentQuestionDelimiter) + 1)
-			};
-		});
-		keys.sort((a, b) => (a.time < b.time ? 1 : -1));
-		const [latestKey] = keys;
-		const currentQuestion = await platform.env?.QUESTION_STORE.get(latestKey.key, 'text');
-		if (!currentQuestion) {
-			return addNoCacheHeader(
-				new Response(JSON.stringify({ err: { message: 'No current question' } }), {
-					status: 404
-				})
-			);
-		}
-		rawData = currentQuestion;
-		const question = JSON.parse(currentQuestion) as PlannedQuestion;
-		return addNoCacheHeader(
-			new Response(JSON.stringify({ data: { currentQuestion: question } }), { status: 200 })
-		);
-	} catch (e) {
-		const err = e as Error;
-		return addNoCacheHeader(
-			new Response(
-				JSON.stringify({ err: { message: err.message, stack: err.stack }, data: rawData }),
-				{ status: 500 }
-			)
-		);
-	}
-}
-
 async function deleteOldCurrentQuestions(platform: Readonly<App.Platform>): Promise<void> {
 	const keyResult = await platform.env?.QUESTION_STORE.list({ prefix: currentQuestionPrefix });
 	if (!keyResult) {
@@ -112,13 +69,22 @@ export async function PUT(e: RequestEvent): Promise<Response> {
 			}
 
 			const question = JSON.parse(q) as Question;
-
-			await Promise.all([
-				platform.env?.QUESTION_STORE.put(currentQuestionKey(new Date()), JSON.stringify(question)),
-				deleteOldCurrentQuestions(platform)
-			]);
+			const stmt = platform.env?.CURRENT_QUESTION_DB.prepare(
+				'INSERT INTO CurrentQuestion (id, question) VALUES(?1,?1'
+			).bind(Date.now(), JSON.stringify(question));
+			const result = await stmt?.run();
+			let duration = 0;
+			let err: string | undefined;
+			if (result) {
+				duration = result.duration;
+				err = result.error;
+			}
+			// await Promise.all([
+			// 	platform.env?.QUESTION_STORE.put(currentQuestionKey(new Date()), JSON.stringify(question)),
+			// 	deleteOldCurrentQuestions(platform)
+			// ]);
 			return addNoCacheHeader(
-				new Response(JSON.stringify({ data: { question } }), { status: 200 })
+				new Response(JSON.stringify({ data: { question }, duration, err }), { status: 200 })
 			);
 		}
 	);
