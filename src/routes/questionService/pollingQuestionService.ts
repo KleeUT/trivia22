@@ -7,7 +7,9 @@ async function getFromServer(
 	fetchAPI: typeof fetch,
 	set: (question: PlannedQuestion) => void
 ): Promise<void> {
-	const fetchResponse = await fetchAPI('/api/currentQuestion');
+	const headers: Headers = new Headers();
+	headers.append('Cache-Control', 'no-cache');
+	const fetchResponse = await fetchAPI('/api/currentQuestion', { headers });
 	if (!fetchResponse.ok || fetchResponse.status >= 400) {
 		const res = await fetchResponse.text;
 		console.error({ status: fetchResponse.status, res });
