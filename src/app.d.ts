@@ -7,6 +7,7 @@ declare namespace App {
 	interface Platform {
 		env?: {
 			QUESTION_STORE: KVNamespace;
+			CURRENT_QUESTIONS_STORE: DurableObject;
 		};
 	}
 }
